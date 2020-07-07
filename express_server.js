@@ -2,14 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const PORT = 8080; // default port 8080
-
-app.set("view engine", "ejs");
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -49,10 +47,10 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-const generateRandomString = function(length) {
+const generateRandomString = function() {
   let randomlyGeneratedString = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < length; i++) {
+  for (let iterations = 0; iterations < 6; iterations++) {
     randomlyGeneratedString += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomlyGeneratedString;
