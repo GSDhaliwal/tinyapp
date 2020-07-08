@@ -30,13 +30,30 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { username: req.cookies["username"], urls: urlDatabase };
+  let templateVars = { user: users[req.cookies["user_id"]], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+app.get("/register", (req, res) => {
+  let templateVars = { user: users[req.cookies["user_id"]], username: req.cookies["username"], users: users};
+  res.render("register", templateVars);
+});
+
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"]};
+  let templateVars = { user: users[req.cookies["user_id"]] };
   res.render("urls_new", templateVars);
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  let templateVars = { user: users[req.cookies["user_id"]], shortURL: shortURL, longURL: urlDatabase[shortURL]};
+  res.render("urls_show", templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  res.redirect(longURL);
 });
 
 app.post("/urls", (req, res) => {
@@ -47,27 +64,10 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomShortURLString}`);
 });
 
-app.get("/urls/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
-  let templateVars = { username: req.cookies["username"], shortURL: shortURL, longURL: urlDatabase[shortURL]};
-  res.render("urls_show", templateVars);
-});
-
-app.get("/u/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
-  res.redirect(longURL);
-});
-
-app.get("/register", (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"], username: req.cookies["username"], users: users};
-  res.render("register", templateVars);
-});
-
 app.post("/register", (req, res) => {
   const randomGeneratedID = generateRandomString();
   users[randomGeneratedID] = {};
-  users[randomGeneratedID].id = randomShortURLString;
+  users[randomGeneratedID].id = randomGeneratedID;
   users[randomGeneratedID].email = req.body["email"];
   users[randomGeneratedID].password = req.body["password"];
   res.cookie("user_id", randomGeneratedID);
@@ -94,7 +94,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
