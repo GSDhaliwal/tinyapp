@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 const app = express();
 const PORT = 8080; // default port 8080
 const urlDatabase = {
@@ -54,7 +55,12 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   let shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL
   res.redirect("/urls");
-})
+});
+
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls");
+});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
