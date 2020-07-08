@@ -7,6 +7,18 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+};
 
 app.set("view engine", "ejs");
 
@@ -48,9 +60,21 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let templateVars = { username: req.cookies["username"]};
+  let templateVars = { user_id: req.cookies["user_id"], username: req.cookies["username"], users: users};
   res.render("register", templateVars);
 });
+
+app.post("/register", (req, res) => {
+  const randomGeneratedID = generateRandomString();
+  users[randomGeneratedID] = {};
+  users[randomGeneratedID].id = randomShortURLString;
+  users[randomGeneratedID].email = req.body["email"];
+  users[randomGeneratedID].password = req.body["password"];
+  res.cookie("user_id", randomGeneratedID);
+  console.log(req.body)
+  console.log(users)
+  res.redirect("/urls");
+})
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
