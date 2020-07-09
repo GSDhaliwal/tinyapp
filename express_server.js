@@ -65,15 +65,17 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  if (req.body.email === "" || req.body.password === "" || userAlreadyExists(req.body.email)) {
+    res.send(400);
+  } else {
   const randomGeneratedID = generateRandomString();
   users[randomGeneratedID] = {};
   users[randomGeneratedID].id = randomGeneratedID;
   users[randomGeneratedID].email = req.body["email"];
   users[randomGeneratedID].password = req.body["password"];
   res.cookie("user_id", randomGeneratedID);
-  console.log(req.body)
-  console.log(users)
   res.redirect("/urls");
+  }
 })
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -118,4 +120,12 @@ const generateRandomString = function() {
     randomlyGeneratedString += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomlyGeneratedString;
+};
+
+const userAlreadyExists = function(email) {
+  for (const user in users) {
+    if (users[user].email === email) {
+      return user;
+    }
+  }
 };
