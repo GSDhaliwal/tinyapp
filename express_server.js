@@ -7,15 +7,15 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
 };
@@ -30,7 +30,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { user: users[req.cookies["user_id"]], urls: urlDatabase };
+  let templateVars = {
+    user: users[req.cookies["user_id"]],
+    urls: urlDatabase
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -70,18 +73,37 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "" || userAlreadyExists(req.body.email)) {
+  if (req.body.email === "" || req.body.password === "" || logInAlreadyExists(req.body.email)) {
     res.send(400);
   } else {
-  const randomGeneratedID = generateRandomString();
-  users[randomGeneratedID] = {};
-  users[randomGeneratedID].id = randomGeneratedID;
-  users[randomGeneratedID].email = req.body["email"];
-  users[randomGeneratedID].password = req.body["password"];
-  res.cookie("user_id", randomGeneratedID);
-  res.redirect("/urls");
+    const randomGeneratedID = generateRandomString();
+    users[randomGeneratedID] = {};
+    users[randomGeneratedID].id = randomGeneratedID;
+    users[randomGeneratedID].email = req.body["email"];
+    users[randomGeneratedID].password = req.body["password"];
+    res.cookie("user_id", randomGeneratedID);
+    res.redirect("/urls");
   }
-})
+});
+
+app.post("/login", (req, res) => {
+  for (const user in users) {
+    if (req.body.email === users[user].email) {
+      if (req.body.password === users[user].password) {
+        res.cookie("user_id", user);
+        res.redirect("/urls");
+        return;
+      }
+    }
+  }
+  res.send(403);
+});
+
+app.post("/logout", (req, res) => {
+  
+  res.clearCookie("user_id");
+  res.redirect("/urls");
+});
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
@@ -94,17 +116,6 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect("/urls");
 });
-
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
-});
-
-app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
-  res.redirect("/urls");
-});
-
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -127,7 +138,7 @@ const generateRandomString = function() {
   return randomlyGeneratedString;
 };
 
-const userAlreadyExists = function(email) {
+const logInAlreadyExists = function(email) {
   for (const user in users) {
     if (users[user].email === email) {
       return user;
