@@ -29,6 +29,43 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+app.get("/register", (req, res) => {
+  let templateVars = { user: users[req.cookies["user_id"]], users: users};
+  res.render("register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  if (req.body.email === "" || req.body.password === "" || logInAlreadyExists(req.body.email)) {
+    res.send(400);
+  } else {
+    const randomGeneratedID = generateRandomString();
+    users[randomGeneratedID] = {};
+    users[randomGeneratedID].id = randomGeneratedID;
+    users[randomGeneratedID].email = req.body["email"];
+    users[randomGeneratedID].password = req.body["password"];
+    res.cookie("user_id", randomGeneratedID);
+    res.redirect("/urls");
+  }
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = { user: users[req.cookies["user_id"]], users: users};
+  res.render("login", templateVars);
+});
+
+app.post("/login", (req, res) => {
+  for (const user in users) {
+    if (req.body.email === users[user].email) {
+      if (req.body.password === users[user].password) {
+        res.cookie("user_id", user);
+        res.redirect("/urls");
+        return;
+      }
+    }
+  }
+  res.send(403);
+});
+
 app.get("/urls", (req, res) => {
   let templateVars = {
     user: users[req.cookies["user_id"]],
@@ -37,19 +74,13 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.get("/register", (req, res) => {
-  let templateVars = { user: users[req.cookies["user_id"]], users: users};
-  res.render("register", templateVars);
-});
-
-app.get("/login", (req, res) => {
-  let templateVars = { user: users[req.cookies["user_id"]], users: users};
-  res.render("login", templateVars);
-});
-
 app.get("/urls/new", (req, res) => {
-  let templateVars = { user: users[req.cookies["user_id"]] };
-  res.render("urls_new", templateVars);
+    if (req.cookies["user_id"]) {
+      let templateVars = { user: users[req.cookies["user_id"]] };
+      res.render("urls_new", templateVars);
+      return;
+    }
+  res.redirect("/login");
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -72,35 +103,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomShortURLString}`);
 });
 
-app.post("/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "" || logInAlreadyExists(req.body.email)) {
-    res.send(400);
-  } else {
-    const randomGeneratedID = generateRandomString();
-    users[randomGeneratedID] = {};
-    users[randomGeneratedID].id = randomGeneratedID;
-    users[randomGeneratedID].email = req.body["email"];
-    users[randomGeneratedID].password = req.body["password"];
-    res.cookie("user_id", randomGeneratedID);
-    res.redirect("/urls");
-  }
-});
-
-app.post("/login", (req, res) => {
-  for (const user in users) {
-    if (req.body.email === users[user].email) {
-      if (req.body.password === users[user].password) {
-        res.cookie("user_id", user);
-        res.redirect("/urls");
-        return;
-      }
-    }
-  }
-  res.send(403);
-});
-
 app.post("/logout", (req, res) => {
-  
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
