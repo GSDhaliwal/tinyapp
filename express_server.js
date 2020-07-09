@@ -35,8 +35,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let templateVars = { user: users[req.cookies["user_id"]], username: req.cookies["username"], users: users};
+  let templateVars = { user: users[req.cookies["user_id"]], users: users};
   res.render("register", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = { user: users[req.cookies["user_id"]], users: users};
+  res.render("login", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {

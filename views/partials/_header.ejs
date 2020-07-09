@@ -11,15 +11,15 @@
         <% if (user) { %>
           <label for="user"><%= user.email %></label>
           <form method="POST" action="/logout">
-          <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
-        <% } else { %>
-          <form class="form-inline" action="/login" method="POST">
+            <button type="submit" class="btn btn-primary">Logout</button>
+          </form>
+        <% } else { %>  
           <div class="form-group mb-2">
-      
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button><a href="/login">LogIn</a></button>
           </div>
-        </form>
+          <div class="form-group mb-2">
+            <button><a href="/register">Sign Up</a></button>
+          </div>
         <% } %>
       </div>
     </div>
