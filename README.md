@@ -7,10 +7,8 @@ Who said bigger is better??
 ## Final Product
 
 
-!["screenshot description"](x-special/nautilus-clipboard
-copy
-file:///home/gurcharan/Pictures/Screenshot%20from%202020-07-10%2008-31-12.png)
-!["screenshot description"](#)
+!["Registration Page"](https://github.com/GSDhaliwal/tinyapp/blob/master/docs/register-page.png?raw=true)
+!["Main URLs Page"](https://github.com/GSDhaliwal/tinyapp/blob/master/docs/urls-page.png?raw=true)
 
 ## Dependencies
 
