@@ -33,10 +33,9 @@ const getUserByEmail = function(email, database) {
   for (const user in database) {
     if (users[user].email === email) {
       return user;
-    } else {
-      return undefined;
     }
   }
+  return null;
 };
 const urlsForUser = function(id) {
   let filteredDatabase = {};
@@ -78,10 +77,11 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "" || getUserByEmail(req.body.email, users)) {
-    console.log(req.body);
+  if (req.body.email === "" || req.body.password === "") {
     res.redirect("/error");
-    return;
+  }
+  if (getUserByEmail(req.body.email, users)) {
+    res.redirect("/error");
   } else {
     const randomGeneratedID = generateRandomString();
     const hashedPassword = bcrypt.hashSync(req.body["password"], 10);
@@ -106,7 +106,6 @@ app.post("/login", (req, res) => {
     if (req.body.email === users[user].email) {
       const hashedPassword = bcrypt.hashSync(req.body.password, 10);
       if (bcrypt.compareSync(req.body.password, hashedPassword)) {
-        console.log(users);
         req.session.user_id = user;
         res.redirect("/urls");
         return;

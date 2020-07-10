@@ -23,7 +23,7 @@ describe('getUserByEmail', function() {
   });
   it('should not return a user with valid email', function() {
     const user = getUserByEmail("user4@example.com", testUsers)
-    const expectedOutput = undefined;
+    const expectedOutput = null;
     assert.equal(user, expectedOutput);
   });
 });
