@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
 //const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const app = express();
@@ -21,17 +21,45 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+const generateRandomString = function() {
+  let randomlyGeneratedString = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let iterations = 0; iterations < 6; iterations++) {
+    randomlyGeneratedString += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return randomlyGeneratedString;
+};
+const getUserByEmail = function(email, database) {
+  for (const user in database) {
+    if (users[user].email === email) {
+      return user;
+    } else {
+      return undefined;
+    }
+  }
+};
+const urlsForUser = function(id) {
+  let filteredDatabase = {};
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      filteredDatabase[url] = urlDatabase[url];
+    }
+  }
+  return filteredDatabase;
+};
+
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: ["purplepricklypineapples"]
-}))
+}));
 //app.use(cookieParser());
+
 
 // starting server codes
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -53,6 +81,7 @@ app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "" || getUserByEmail(req.body.email, users)) {
     console.log(req.body);
     res.redirect("/error");
+    return;
   } else {
     const randomGeneratedID = generateRandomString();
     const hashedPassword = bcrypt.hashSync(req.body["password"], 10);
@@ -77,7 +106,7 @@ app.post("/login", (req, res) => {
     if (req.body.email === users[user].email) {
       const hashedPassword = bcrypt.hashSync(req.body.password, 10);
       if (bcrypt.compareSync(req.body.password, hashedPassword)) {
-        console.log(users)
+        console.log(users);
         req.session.user_id = user;
         res.redirect("/urls");
         return;
@@ -148,7 +177,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
     urlDatabase[shortURL].longURL = req.body.longURL;
     res.redirect("/urls");
   }
-    res.redirect("/error");
+  res.redirect("/error");
 });
 
 
@@ -188,33 +217,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-const generateRandomString = function() {
-  let randomlyGeneratedString = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let iterations = 0; iterations < 6; iterations++) {
-    randomlyGeneratedString += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomlyGeneratedString;
-};
 
-const getUserByEmail = function(email, database) {
-  for (const user in database) {
-    if (users[user].email === email) {
-      return user;
-    } else {
-      return undefined;
-    }
-  }
-};
 
-const urlsForUser = function(id) {
-  let filteredDatabase = {};
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      filteredDatabase[url] = urlDatabase[url];
-    }
-  }
-  return filteredDatabase;
-};
-
-module.exports = { getUserByEmail }
+module.exports = { getUserByEmail };
